@@ -1,5 +1,7 @@
 package webservice.demo;
 
+import java.security.SecureRandom;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.http.MediaType;
@@ -21,26 +23,46 @@ public class MyController {
     @GetMapping(value="/register.php", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String Register(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
         try {
-            boolean ris=Db.Instance().Register(username, password);
-            return "{'status':'ok','result':'ciao'}";
+            if(Db.Instance().Register(username, password))
+                return "{'status':'ok','result':'ciao'}";
+            else
+                return "{'status':'error','message':'riprova'}";
         } catch (SQLException e) {
             return "{'status':'error','message':'"+e.getMessage()+"'}";
         }
     }
     @GetMapping(value="/getToken.php", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String GetToken(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
-         System.out.println(username+" "+password);
-        return "{'success':true,'result':'ciao'}";
-    }
-    @GetMapping(value="/sayHello.php", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String SayHello(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
-         System.out.println(username+" "+password);
-        return "{'success':true,'result':'ciao'}";
+         try {
+             int id=Db.Instance().GetToken(username, password);
+            if(id>=0)
+            {
+                SecureRandom random = new SecureRandom();
+                byte bytes[] = new byte[20];
+                random.nextBytes(bytes);
+                String token = bytes.toString();
+                if(Db.Instance().SetToken(id, token))
+                return "{'status':'ok','result':{'token':'"+token+"'}}";
+            }
+            else
+                return "{'status':'error','message':'riprova'}";
+        } catch (SQLException e) {
+            return "{'status':'error','message':'"+e.getMessage()+"'}";
+        }
+        return "";
     }
     @GetMapping(value="/setString.php", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String SetString(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
-         System.out.println(username+" "+password);
-        return "{'success':true,'result':'ciao'}";
+    public @ResponseBody String SetString(@RequestParam(name = "token") String token , @RequestParam(name = "key") String key, @RequestParam(name = "string") String string) {
+         try {
+            if(Db.Instance().SetString(Db.Instance().GetUtente(token).getInt("Id"),key,string))
+            {
+                return "{'status':'ok','result':{}}";
+            }
+            else
+                return "{'status':'error','message':'riprova'}";
+        } catch (SQLException e) {
+            return "{'status':'error','message':'"+e.getMessage()+"'}";
+        }
     }
     @GetMapping(value="/getString.php", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String GetString(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
