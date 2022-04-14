@@ -3,7 +3,11 @@ package webservice.demo;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
+import org.json.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MyController {
-
+    private static String alfabeto="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     @GetMapping(value="/", produces = MediaType.APPLICATION_JSON_VALUE)
     public String index() {
 
@@ -37,19 +41,20 @@ public class MyController {
              int id=Db.Instance().GetToken(username, password);
             if(id>=0)
             {
-                SecureRandom random = new SecureRandom();
-                byte bytes[] = new byte[20];
-                random.nextBytes(bytes);
-                String token = bytes.toString();
+                Random random = new Random();
+                String token="";
+                for(int i=0;i<16;i++)
+                    token+=alfabeto.charAt(random.nextInt(0,alfabeto.length()));
                 if(Db.Instance().SetToken(id, token))
                 return "{'status':'ok','result':{'token':'"+token+"'}}";
+                else
+                return "{'status':'error','message':'riprova'}";
             }
             else
                 return "{'status':'error','message':'riprova'}";
         } catch (SQLException e) {
             return "{'status':'error','message':'"+e.getMessage()+"'}";
         }
-        return "";
     }
     @GetMapping(value="/setString.php", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String SetString(@RequestParam(name = "token") String token , @RequestParam(name = "key") String key, @RequestParam(name = "string") String string) {
@@ -65,9 +70,53 @@ public class MyController {
         }
     }
     @GetMapping(value="/getString.php", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String GetString(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
-         System.out.println(username+" "+password);
-        return "{'success':true,'result':'ciao'}";
+    public @ResponseBody String GetString(@RequestParam(name = "token") String token , @RequestParam(name = "key") String key) {
+        try {
+            ResultSet rs=Db.Instance().GetString(Db.Instance().GetUtente(token).getInt("Id"),key);
+            if(rs!=null)
+            {
+                return "{'status':'ok','result':{"+rs.getString("testo")+"}}";
+            }
+            else
+                return "{'status':'error','message':'riprova'}";
+        } catch (SQLException e) {
+            return "{'status':'error','message':'"+e.getMessage()+"'}";
+        }
+    }
+    @GetMapping(value="/deleteString.php", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String DeleteString(@RequestParam(name = "token") String token , @RequestParam(name = "key") String key) {
+        try {
+            if(Db.Instance().DeleteString(Db.Instance().GetUtente(token).getInt("Id"),key))
+            {
+                return "{'status':'ok','result':{'testo':'eliminata con successo'}}";
+            }
+            else
+                return "{'status':'error','message':'riprova'}";
+        } catch (SQLException e) {
+            return "{'status':'error','message':'"+e.getMessage()+"'}";
+        }
+    }
+    @GetMapping(value="/getKeys.php", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String GetKeys(@RequestParam(name = "token") String token) {
+        try {
+            ResultSet rs=Db.Instance().GetKeys(Db.Instance().GetUtente(token).getInt("Id"));
+            if(rs!=null)
+            {
+                List<String> keys=new ArrayList<String>();
+                keys.add(rs.getString("chiave"));
+                while(rs.next())
+                    keys.add(rs.getString("chiave"));
+                JSONObject ris=new JSONObject();
+                ris.put("result", keys);
+                ris.put("status", "ok");
+
+                return ris.toString();
+            }
+            else
+                return "{'status':'error','message':'riprova'}";
+        } catch (SQLException e) {
+            return "{'status':'error','message':'"+e.getMessage()+"'}";
+        }
     }
 
 }

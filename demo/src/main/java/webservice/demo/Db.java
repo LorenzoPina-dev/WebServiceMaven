@@ -38,14 +38,16 @@ public class Db {
         return -1;
     }
     public boolean SetString(int idUtente, String key, String string) throws SQLException{
-        PreparedStatement query = con.prepareStatement("insert into string (key,testo,idUtente) values(?,?,?)");
+        PreparedStatement query = con.prepareStatement("insert into string (chiave,testo,idUtente) values(?,?,?)");
         query.setString(1, key);
         query.setString(2,string);
         query.setInt(3,idUtente);
-        return query.execute();
+        int ris=query.executeUpdate();
+        System.out.println(ris);
+        return ris==1;
     }
     public ResultSet GetString(int idUtente, String key) throws SQLException{
-        PreparedStatement query = con.prepareStatement("select testo from string where key=? and idUtente=? ");
+        PreparedStatement query = con.prepareStatement("select testo from string where chiave=? and idUtente=? ");
         query.setString(1, key);
         query.setInt(2, idUtente);
         if(query.execute())
@@ -57,13 +59,15 @@ public class Db {
         return null;
     }
     public boolean DeleteString(int idUtente, String key) throws SQLException{
-        PreparedStatement query = con.prepareStatement("delete from string where key=? and idUtente=?");
+        PreparedStatement query = con.prepareStatement("delete from string where chiave=? and idUtente=?");
         query.setString(1, key);
         query.setInt(2, idUtente);
-        return query.execute();
+        int ris=query.executeUpdate();
+        System.out.println(ris);
+        return ris==1;
     }
     public ResultSet GetKeys(int idUtente) throws SQLException{
-        PreparedStatement query = con.prepareStatement("selct key from string where idUtente=?");
+        PreparedStatement query = con.prepareStatement("select chiave from string where idUtente=?");
         query.setInt(1, idUtente);
         if(query.execute())
             {
@@ -90,6 +94,8 @@ public class Db {
         PreparedStatement query = con.prepareStatement("update utente set Token = ? where Id=?");
         query.setString(1, token);
         query.setInt(2, idUtente);
-        return query.execute();
+        int ris=query.executeUpdate();
+        System.out.println(ris);
+        return ris==1;
     }
 }
