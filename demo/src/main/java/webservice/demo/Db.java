@@ -37,10 +37,24 @@ public class Db {
         }
         return -1;
     }
-    public boolean SetString(int idUtente, String key, String string) throws SQLException{
-        PreparedStatement query = con.prepareStatement("insert into string (chiave,testo,idUtente) values(?,?,?)");
-        query.setString(1, key);
-        query.setString(2,string);
+    public boolean SetString(int idUtente, String key, String string) {
+
+        try (PreparedStatement query = con.prepareStatement("insert into string (chiave,testo,idUtente) values(?,?,?)")) {
+            query.setString(1, key);
+            query.setString(2,string);
+            query.setInt(3,idUtente);
+            int ris=query.executeUpdate();
+            System.out.println(ris);
+            return ris==1;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+    
+    public boolean UpdateString(int idUtente, String key, String string) throws SQLException{
+        PreparedStatement query = con.prepareStatement("update string SET testo = ? WHERE chiave = ? and idUtente = ?");
+        query.setString(1,string);
+        query.setString(2, key);
         query.setInt(3,idUtente);
         int ris=query.executeUpdate();
         System.out.println(ris);

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MyController {
-    private static String alfabeto="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     @GetMapping(value="/", produces = MediaType.APPLICATION_JSON_VALUE)
     public String index() {
 
@@ -31,9 +30,9 @@ public class MyController {
             if(Db.Instance().Register(username, password))
                 return "{'status':'ok','result':'ciao'}";
             else
-                return "{'status':'error','message':'riprova'}";
+            return "{'status':'error','message':'utente gia registrato'}";
         } catch (SQLException e) {
-            return "{'status':'error','message':'"+e.getMessage()+"'}";
+            return "{'status':'error','message':'utente gia registrato'}";
         }
     }
     @GetMapping(value="/getToken.php", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,12 +47,12 @@ public class MyController {
                 secureRandom.nextBytes(randomBytes);
                 String token= base64Encoder.encodeToString(randomBytes);
                 if(Db.Instance().SetToken(id, token))
-                return "{'status':'ok','result':{'token':'"+token+"'}}";
+                    return "{'status':'ok','result':{'token':'"+token+"'}}";
                 else
-                return "{'status':'error','message':'riprova'}";
+                    return "{'status':'error','message':'username o passowrd errati'}";
             }
             else
-                return "{'status':'error','message':'riprova'}";
+                return "{'status':'error','message':'username o passowrd errati'}";
         } catch (SQLException e) {
             return "{'status':'error','message':'"+e.getMessage()+"'}";
         }
@@ -61,12 +60,15 @@ public class MyController {
     @GetMapping(value="/setString.php", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String SetString(@RequestParam(name = "token") String token , @RequestParam(name = "key") String key, @RequestParam(name = "string") String string) {
          try {
-            if(Db.Instance().SetString(Db.Instance().GetUtente(token).getInt("Id"),key,string))
+             int id=Db.Instance().GetUtente(token).getInt("Id");
+            if(Db.Instance().SetString(id,key,string))
             {
-                return "{'status':'ok','result':{}}";
+                return "{'status':'ok','result':{'stringa inserira'}}";
             }
+            else if (Db.Instance().UpdateString(Db.Instance().GetUtente(token).getInt("Id"), key, string))
+                return "{'status':'error','message':'Stringa aggiornata'}";
             else
-                return "{'status':'error','message':'riprova'}";
+                return "{'status':'error','message':'token non valido'}";
         } catch (SQLException e) {
             return "{'status':'error','message':'"+e.getMessage()+"'}";
         }
@@ -90,12 +92,12 @@ public class MyController {
         try {
             if(Db.Instance().DeleteString(Db.Instance().GetUtente(token).getInt("Id"),key))
             {
-                return "{'status':'ok','result':{'testo':'eliminata con successo'}}";
+                return "{'status':'ok','result':{'testo':'stringa rimossa'}}";
             }
             else
-                return "{'status':'error','message':'riprova'}";
+                return "{'status':'error','message':'key non trovata'}";
         } catch (SQLException e) {
-            return "{'status':'error','message':'"+e.getMessage()+"'}";
+            return "{'status':'error','message':'key non trovata'}";
         }
     }
     @GetMapping(value="/getKeys.php", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -115,9 +117,9 @@ public class MyController {
                 return ris.toString();
             }
             else
-                return "{'status':'error','message':'riprova'}";
+                return "{'status':'error','message':'token non valido'}";
         } catch (SQLException e) {
-            return "{'status':'error','message':'"+e.getMessage()+"'}";
+            return "{'status':'error','message':'token non valido'}";
         }
     }
 
