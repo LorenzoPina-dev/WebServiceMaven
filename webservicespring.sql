@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Apr 22, 2022 alle 12:32
+-- Creato il: Apr 22, 2022 alle 12:50
 -- Versione del server: 10.4.6-MariaDB
 -- Versione PHP: 7.3.8
 
@@ -53,7 +53,10 @@ CREATE TABLE `utente` (
 --
 
 INSERT INTO `utente` (`Id`, `Username`, `Password`, `Token`) VALUES
-(1, 'pippo', 'ciao', 'jqgQQ5RHlhHJpZio6Zc_Uk96o1DTmumF');
+(1, 'pippo', 'ciao', 'LOSEXH6ZSwMtk1crsXkvy2gtKlj4rGBh'),
+(2, 'pippo', 'ciao', NULL),
+(3, 'pippo1', 'ciao', NULL),
+(4, 'pippo2', 'ciao', NULL);
 
 --
 -- Indici per le tabelle scaricate
@@ -64,13 +67,15 @@ INSERT INTO `utente` (`Id`, `Username`, `Password`, `Token`) VALUES
 --
 ALTER TABLE `string`
   ADD PRIMARY KEY (`Id`),
+  ADD UNIQUE KEY `chiave` (`chiave`),
   ADD KEY `FK1` (`idUtente`);
 
 --
 -- Indici per le tabelle `utente`
 --
 ALTER TABLE `utente`
-  ADD PRIMARY KEY (`Id`);
+  ADD PRIMARY KEY (`Id`),
+  ADD UNIQUE KEY `Username` (`Username`,`Token`);
 
 --
 -- AUTO_INCREMENT per le tabelle scaricate
@@ -80,13 +85,13 @@ ALTER TABLE `utente`
 -- AUTO_INCREMENT per la tabella `string`
 --
 ALTER TABLE `string`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT per la tabella `utente`
 --
 ALTER TABLE `utente`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Limiti per le tabelle scaricate
