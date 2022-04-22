@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 
@@ -41,10 +42,11 @@ public class MyController {
              int id=Db.Instance().GetToken(username, password);
             if(id>=0)
             {
-                Random random = new Random();
-                String token="";
-                for(int i=0;i<16;i++)
-                    token+=alfabeto.charAt(random.nextInt(0,alfabeto.length()));
+                SecureRandom secureRandom = new SecureRandom(); // threadsafe
+                Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+                byte[] randomBytes = new byte[24];
+                secureRandom.nextBytes(randomBytes);
+                String token= base64Encoder.encodeToString(randomBytes);
                 if(Db.Instance().SetToken(id, token))
                 return "{'status':'ok','result':{'token':'"+token+"'}}";
                 else
