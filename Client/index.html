@@ -7,6 +7,7 @@
     <title>Document</title>
     <script src="jquery-3.6.0.min.js"></script>
     <script>
+        $(document).ready(()=>{
         $("#login").click(()=>{
             let url="http://localhost:8080/getToken";
             $.get(
@@ -17,7 +18,7 @@
                 },
                 "json")
         })
-
+})
 
     </script>
 </head>
