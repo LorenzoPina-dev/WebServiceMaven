@@ -7,11 +7,13 @@ import java.util.Base64;
 
 import org.json.*;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 @RestController
+@CrossOrigin(origins="*")
 public class MyController {
     @GetMapping(value="/", produces = MediaType.APPLICATION_JSON_VALUE)
     public String index() {
