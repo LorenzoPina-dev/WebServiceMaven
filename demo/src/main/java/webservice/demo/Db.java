@@ -11,8 +11,7 @@ public class Db {
     private static Db instance=null;
     private Connection con;
     private Db() throws SQLException{
-        
-        con=DriverManager.getConnection( "jdbc:mysql://localhost:3306/webservicespring","root","");
+        con=DriverManager.getConnection("jdbc:mysql://localhost:3306/webservicespring","root","");
     }
     public static Db Instance() throws SQLException{
         if(instance==null)
@@ -23,7 +22,9 @@ public class Db {
         PreparedStatement query = con.prepareStatement("insert into utente (Username,Password) values(?,?)");
         query.setString(1, username);
         query.setString(2,password);
-        return query.execute();
+        int ris=query.executeUpdate();
+        System.out.println(ris);
+        return ris==1;
     }
     public int GetToken(String username, String password) throws SQLException{
         System.out.println(username+";"+password);

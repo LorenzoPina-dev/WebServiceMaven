@@ -27,7 +27,7 @@ public class MyController {
             if(Db.Instance().Register(username, password))
             {
                 JSONObject ris=new JSONObject();
-                ris.put("result", "ciao");
+                ris.put("result", "utente registrato");
                 ris.put("status", "ok");
                 return ris.toString();
             }
@@ -39,7 +39,7 @@ public class MyController {
             }
         } catch (SQLException e) {
             JSONObject ris=new JSONObject();
-            ris.put("message", "utente gia registrato");
+            ris.put("message", e.getMessage());
             ris.put("status", "error");
             return ris.toString();
         }
@@ -173,9 +173,9 @@ public class MyController {
             if(id>=0)
             {
                 ResultSet rs=Db.Instance().GetKeys(id);
+                JSONArray keys=new JSONArray();
                 if(rs!=null)
                 {
-                    JSONArray keys=new JSONArray();
                     if(rs.getRow()>0)
                     {keys.put(rs.getString("chiave"));
                     while(rs.next())

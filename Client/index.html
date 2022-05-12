@@ -11,7 +11,7 @@
         var token = "";
 
         function caricaGetKeys() {
-            console.log(token)
+            creaMenu();
             $.get("http://localhost:8080/getKeys.php", {
                     token: token
                 },
@@ -27,51 +27,74 @@
         }
 
         function caricaAddStringa() {
+            creaMenu();
+            let div = $("<div></div>");
+            div.append($("<input type='text' id='key'></input>"));
+            div.append($("<input type='text' id='val'></input>"));
+            let button = $("<button></button>").text("aggiungi");
+            button.click(() => {
+                $.get("http://localhost:8080/setString.php", {
+                        token: token,
+                        key: $("#key").val(),
+                        string: $("#val").val()
+                    },
+                    (data, status) => {
+                        $("#response").html(JSON.stringify(data));
+                        if (data["status"] == "ok") {
+                            alert("un passo avanti")
+                        }
+                    },
+                    "json")
+            })
 
-            console.log(token)
-            let nomeKey = $("<input type='text' id='key'></input>");
-
-            getKeys.click(caricaGetKeys);
-            $.get("http://localhost:8080/setString.php", {
-                    token: token
-                },
-                (data, status) => {
-                    $("#response").html(JSON.stringify(data));
-                    if (data["status"] == "ok") {
-                        allert("un passo avanti")
-                    }
-                },
-                "json")
+            div.append(button);
+            $("#attuale").append(div);
         }
 
         function caricaGetStringa() {
+            creaMenu();
+            let div = $("<div></div>");
+            div.append($("<input type='text' id='key'></input>"));
+            let button = $("<button></button>").text("get");
+            button.click(() => {
+                $.get("http://localhost:8080/getString.php", {
+                        token: token,
+                        key: $("#key").val()
+                    },
+                    (data, status) => {
+                        $("#response").html(JSON.stringify(data));
+                        if (data["status"] == "ok") {
+                            alert("un passo avanti")
+                        }
+                    },
+                    "json")
+            })
 
-            console.log(token)
-            $.get("http://localhost:8080/getKeys.php", {
-                    token: token
-                },
-                (data, status) => {
-                    $("#response").html(JSON.stringify(data));
-                    if (data["status"] == "ok") {
-                        allert("un passo avanti")
-                    }
-                },
-                "json")
+            div.append(button);
+            $("#attuale").append(div);
         }
 
         function caricaRemoveStringa() {
+            creaMenu();
+            let div = $("<div></div>");
+            div.append($("<input type='text' id='key'></input>"));
+            let button = $("<button></button>").text("remove");
+            button.click(() => {
+                $.get("http://localhost:8080/deleteString.php", {
+                        token: token,
+                        key: $("#key").val()
+                    },
+                    (data, status) => {
+                        $("#response").html(JSON.stringify(data));
+                        if (data["status"] == "ok") {
+                            alert("un passo avanti")
+                        }
+                    },
+                    "json")
+            })
 
-            console.log(token)
-            $.get("http://localhost:8080/getKeys.php", {
-                    token: token
-                },
-                (data, status) => {
-                    $("#response").html(JSON.stringify(data));
-                    if (data["status"] == "ok") {
-                        allert("un passo avanti")
-                    }
-                },
-                "json")
+            div.append(button);
+            $("#attuale").append(div);
         }
 
         function creaMenu() {
@@ -101,6 +124,19 @@
                     },
                     "json")
             })
+            $("#register").click(() => {
+                $.get("http://localhost:8080/register.php", {
+                        username: $("#username").val(),
+                        password: $("#password").val()
+                    },
+                    (data, status) => {
+                        $("#response").html(JSON.stringify(data));
+                        if (data["status"] == "ok") {
+                            $("#response").html(JSON.stringify(data));
+                        }
+                    },
+                    "json")
+            })
         })
     </script>
 </head>
@@ -111,6 +147,7 @@
             <input id="username">
             <input id="password">
             <button id="login">login</button>
+            <button id="register">register</button>
         </div>
     </div>
 
