@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+@CrossOrigin(origins = "*")
 @RestController
-@CrossOrigin(origins="*")
 public class MyController {
     @GetMapping(value="/", produces = MediaType.APPLICATION_JSON_VALUE)
     public String index() {
@@ -81,7 +81,7 @@ public class MyController {
             }
         } catch (SQLException e) {
             JSONObject ris=new JSONObject();
-            ris.put("message", "e.getMessage()");
+            ris.put("message", e.getMessage());
             ris.put("status", "error");
             return ris.toString();
         }
@@ -169,29 +169,42 @@ public class MyController {
     @GetMapping(value="/getKeys.php", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String GetKeys(@RequestParam(name = "token") String token) {
         try {
-            ResultSet rs=Db.Instance().GetKeys(Db.Instance().GetUtente(token).getInt("Id"));
-            if(rs!=null)
+            int id=Db.Instance().GetUtente(token).getInt("Id");
+            if(id>=0)
             {
-                JSONArray keys=new JSONArray();
-                keys.put(rs.getString("chiave"));
-                while(rs.next())
-                    keys.put(rs.getString("chiave"));
-                JSONObject ris=new JSONObject();
-                ris.put("result", keys);
-                ris.put("status", "ok");
+                ResultSet rs=Db.Instance().GetKeys(id);
+                if(rs!=null)
+                {
+                    JSONArray keys=new JSONArray();
+                    if(rs.getRow()>0)
+                    {keys.put(rs.getString("chiave"));
+                    while(rs.next())
+                        keys.put(rs.getString("chiave"));
+                }
+                    JSONObject ris=new JSONObject();
+                    ris.put("result", keys);
+                    ris.put("status", "ok");
 
-                return ris.toString();
+                    return ris.toString();
+                }
+                else
+                {
+                    JSONObject ris=new JSONObject();
+                    ris.put("message", "key non trovata'");
+                    ris.put("status", "error");
+                    return ris.toString();
+                }
             }
-            else
-            {
-                JSONObject ris=new JSONObject();
-                ris.put("message", "key non trovata'");
-                ris.put("status", "error");
-                return ris.toString();
-            }
+                else
+                {
+                    JSONObject ris=new JSONObject();
+                    ris.put("message", "key non trovata'");
+                    ris.put("status", "error");
+                    return ris.toString();
+                }
         } catch (SQLException e) {
             JSONObject ris=new JSONObject();
-            ris.put("message", "key non valido'");
+            ris.put("message", e.getMessage());
             ris.put("status", "error");
             return ris.toString();
         }

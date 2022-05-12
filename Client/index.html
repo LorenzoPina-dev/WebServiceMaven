@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,25 +8,113 @@
     <title>Document</title>
     <script src="jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(()=>{
-        $("#login").click(()=>{
-            let url="http://localhost:8080/getToken";
-            $.get(
-                url,
-                {username:$("#username").val(),password:$("#password").val()},
-                (data,status)=>{
-                    $("#response").html(data)
+        var token = "";
+
+        function caricaGetKeys() {
+            console.log(token)
+            $.get("http://localhost:8080/getKeys.php", {
+                    token: token
+                },
+                (data, status) => {
+                    $("#response").html(JSON.stringify(data));
+                    if (data["status"] == "ok") {
+                        for (key of data["result"]) {
+                            $("#attuale").append($("<h3></h3>").text(key));
+                        }
+                    }
                 },
                 "json")
-        })
-})
+        }
 
+        function caricaAddStringa() {
+
+            console.log(token)
+            let nomeKey = $("<input type='text' id='key'></input>");
+
+            getKeys.click(caricaGetKeys);
+            $.get("http://localhost:8080/setString.php", {
+                    token: token
+                },
+                (data, status) => {
+                    $("#response").html(JSON.stringify(data));
+                    if (data["status"] == "ok") {
+                        allert("un passo avanti")
+                    }
+                },
+                "json")
+        }
+
+        function caricaGetStringa() {
+
+            console.log(token)
+            $.get("http://localhost:8080/getKeys.php", {
+                    token: token
+                },
+                (data, status) => {
+                    $("#response").html(JSON.stringify(data));
+                    if (data["status"] == "ok") {
+                        allert("un passo avanti")
+                    }
+                },
+                "json")
+        }
+
+        function caricaRemoveStringa() {
+
+            console.log(token)
+            $.get("http://localhost:8080/getKeys.php", {
+                    token: token
+                },
+                (data, status) => {
+                    $("#response").html(JSON.stringify(data));
+                    if (data["status"] == "ok") {
+                        allert("un passo avanti")
+                    }
+                },
+                "json")
+        }
+
+        function creaMenu() {
+            $("#attuale").remove("*");
+            let getKeys = $("<button></button>").text("getKeys");
+            getKeys.click(caricaGetKeys);
+            let addStringa = $("<button></button>").text("addStringa");
+            addStringa.click(caricaAddStringa);
+            let getStringa = $("<button></button>").text("getStringa");
+            getStringa.click(caricaGetStringa);
+            let removeStringa = $("<button></button>").text("removeStringa");
+            removeStringa.click(caricaRemoveStringa);
+            $("#content").append($("<div id='attuale'></div>").append(getKeys, addStringa, getStringa, removeStringa))
+        }
+        $(document).ready(() => {
+            $("#login").click(() => {
+                $.get("http://localhost:8080/getToken.php", {
+                        username: $("#username").val(),
+                        password: $("#password").val()
+                    },
+                    (data, status) => {
+                        $("#response").html(JSON.stringify(data));
+                        if (data["status"] == "ok") {
+                            token = data["result"]["token"];
+                            creaMenu();
+                        }
+                    },
+                    "json")
+            })
+        })
     </script>
 </head>
+
 <body>
-    <input id="username">
-    <input id="password">
-    <button id="login">login</button>
+    <div id="content">
+        <div id="attuale">
+            <input id="username">
+            <input id="password">
+            <button id="login">login</button>
+        </div>
+    </div>
+
     <h1 id="response"></h1>
 </body>
+
 </html>
